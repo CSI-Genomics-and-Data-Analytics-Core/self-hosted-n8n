@@ -1,0 +1,91 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: n8nuser
+      POSTGRES_PASSWORD: n8npass
+      POSTGRES_DB: n8ndb
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [web]
+
+  n8n:
+    image: n8nio/n8n:1.117.3
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # DB connection
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_DATABASE: n8ndb
+      DB_POSTGRESDB_USER: n8nuser
+      DB_POSTGRESDB_PASSWORD: n8npass
+
+      # External URL settings
+      N8N_HOST: n8n.gedac.org
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: https
+      WEBHOOK_URL: https://n8n.gedac.org/
+      N8N_EDITOR_BASE_URL: https://n8n.gedac.org/
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      # n8n's built-in Basic Auth
+      # N8N_BASIC_AUTH_ACTIVE: "true"
+      # N8N_BASIC_AUTH_USER: "admin"
+      # N8N_BASIC_AUTH_PASSWORD: "strong-password"
+
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+      - ./files:/files
+    networks: [web]
+  
+  # dedicated Postgres for RAG + pgvector ---
+  postgres_rag:
+    image: pgvector/pgvector:pg17   # Postgres 17 with pgvector preinstalled
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${RAG_DB_USER:-raguser}
+      POSTGRES_PASSWORD: ${RAG_DB_PASS:-ragpass}
+      POSTGRES_DB: ${RAG_DB_NAME:-ragdb}
+      PGDATA: /var/lib/postgresql/data
+    command: >
+      postgres -c shared_buffers=1GB
+               -c work_mem=32MB
+               -c maintenance_work_mem=512MB
+               -c effective_io_concurrency=200
+               -c max_wal_size=4GB
+    volumes:
+      - /data/pg_rag:/var/lib/postgresql/data   # <-- lives on your EBS mount
+      - ./rag_init:/docker-entrypoint-initdb.d  # optional init SQL (see below)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [web]
+    # no ports: only accessible on the docker network
+    
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on: [n8n]
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    networks: [web]
+
+networks:
+  web: {}

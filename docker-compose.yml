@@ -1,21 +1,7 @@
 version: "3.9"
 services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: n8nuser
-      POSTGRES_PASSWORD: n8npass
-      POSTGRES_DB: n8ndb
-    volumes:
-      - ./pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    networks: [web]
-
+  # n8n workflow automation platform - main application server
+  # Provides the web UI and executes workflows with external task runner support
   n8n:
     image: n8nio/n8n:1.117.3
     restart: unless-stopped
@@ -56,6 +42,23 @@ services:
       - ./files:/files
     networks: [web]
 
+  # Primary PostgreSQL database for n8n workflow data, executions, and metadata
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: n8nuser
+      POSTGRES_PASSWORD: n8npass
+      POSTGRES_DB: n8ndb
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [web]
+
   # External task runners for Python code execution
   task-runners:
     image: n8nio/runners:1.117.3
@@ -68,7 +71,8 @@ services:
       N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT: "15"
     networks: [web]
   
-  # dedicated Postgres for RAG + pgvector ---
+  # Dedicated PostgreSQL database with pgvector extension for RAG (Retrieval-Augmented Generation)
+  # Optimized for vector similarity search and AI/ML workloads
   postgres_rag:
     image: pgvector/pgvector:pg17   # Postgres 17 with pgvector preinstalled
     restart: unless-stopped
@@ -94,18 +98,20 @@ services:
     networks: [web]
     # no ports: only accessible on the docker network
     
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on: [n8n]
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy/data:/data
-      - ./caddy/config:/config
-    networks: [web]
+  # Caddy is a modern web server with automatic HTTPS that can act as a reverse proxy
+  # for n8n, providing SSL termination and domain routing. Uncomment to enable.
+  # caddy:
+  #   image: caddy:2
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   depends_on: [n8n]
+  #   volumes:
+  #     - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+  #     - ./caddy/data:/data
+  #     - ./caddy/config:/config
+  #   networks: [web]
 
 networks:
   web: {}

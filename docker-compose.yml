@@ -36,6 +36,13 @@ services:
       # N8N_BASIC_AUTH_ACTIVE: "true"
       # N8N_BASIC_AUTH_USER: "admin"
       # N8N_BASIC_AUTH_PASSWORD: "strong-password"
+      
+      # Logging configuration - set to debug for detailed logs
+      N8N_LOG_LEVEL: "debug"
+      N8N_LOG_OUTPUT: "console,file"
+      N8N_LOG_FILE_LOCATION: "/home/node/.n8n/logs/n8n.log"
+      N8N_LOG_FILE_SIZE_MAX: "50"
+      N8N_LOG_FILE_COUNT_MAX: "60"
 
     volumes:
       - ./n8n_data:/home/node/.n8n

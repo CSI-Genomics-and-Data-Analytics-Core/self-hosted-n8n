@@ -2,5 +2,4 @@
 # These will be installed in the task runner's virtual environment
 requests>=2.31.0
 pandas>=2.0.0
-matplotlib>=3.7.0
 numpy>=1.24.0

@@ -1,12 +1,24 @@
 # Custom n8n runners image with additional Python libraries
 FROM n8nio/runners:1.117.3
 
+# Switch to root to install packages
+USER root
+
+# Install build dependencies required for Python packages
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    g++ \
+    linux-headers \
+    python3-dev \
+    py3-pip
+
 # Copy the extras.txt file with additional Python packages
 COPY extras.txt /app/task-runner-python/extras.txt
 
-# Install additional Python packages in the task runner's virtual environment
+# Install additional Python packages using system python and pip into the venv
 RUN set -e; \
-    PY_BIN="/opt/runners/task-runner-python/.venv/bin/python"; \
-    if [ ! -x "$PY_BIN" ]; then PY_BIN="$(command -v python3)"; fi; \
-    "$PY_BIN" -m ensurepip --upgrade; \
-    "$PY_BIN" -m pip install --no-cache-dir -r /app/task-runner-python/extras.txt
+    python3 -m pip install --target /opt/runners/task-runner-python/.venv/lib/python*/site-packages --no-cache-dir -r /app/task-runner-python/extras.txt
+
+# Switch back to the runner user
+USER runner

@@ -11,8 +11,9 @@ RUN apk add --no-cache \
     g++ \
     linux-headers
 
-# Copy requirements file
+# Copy requirements file and task runner config
 COPY requirements.txt /tmp/requirements.txt
+COPY task-runners-config.json /etc/n8n-task-runners.json
 
 # Update pip and install additional Python packages
 RUN python -m pip install --upgrade pip setuptools wheel && \
@@ -22,5 +23,4 @@ RUN python -m pip install --upgrade pip setuptools wheel && \
 # Switch back to the default user
 USER runner
 
-# Set default command (inherited from base image)
-CMD ["n8n", "start", "--runners"]
+# Use the default command from the base image

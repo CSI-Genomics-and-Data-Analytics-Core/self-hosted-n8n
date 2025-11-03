@@ -1,0 +1,10 @@
+{
+  "runners": {
+    "javascript": {
+      "command": "node"
+    },
+    "python": {
+      "command": "python"
+    }
+  }
+}

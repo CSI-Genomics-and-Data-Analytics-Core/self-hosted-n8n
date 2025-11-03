@@ -49,3 +49,13 @@ docker-compose down
 # Update containers
 docker-compose pull && docker-compose up -d
 ```
+
+### Updating n8n Version
+
+When manually changing the n8n version in `docker-compose.yml`, run this command to force recreate only the n8n service:
+
+```bash
+docker compose up -d --no-deps --force-recreate n8n
+```
+
+This ensures the n8n container is rebuilt with the new version without affecting other services.

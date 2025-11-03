@@ -100,18 +100,18 @@ services:
     
   # Caddy is a modern web server with automatic HTTPS that can act as a reverse proxy
   # for n8n, providing SSL termination and domain routing. Uncomment to enable.
-  # caddy:
-  #   image: caddy:2
-  #   restart: unless-stopped
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   depends_on: [n8n]
-  #   volumes:
-  #     - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-  #     - ./caddy/data:/data
-  #     - ./caddy/config:/config
-  #   networks: [web]
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on: [n8n]
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    networks: [web]
 
 networks:
   web: {}

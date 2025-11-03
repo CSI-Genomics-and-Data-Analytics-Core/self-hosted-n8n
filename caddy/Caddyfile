@@ -1,0 +1,16 @@
+n8n.gedac.org {
+    encode gzip
+    reverse_proxy n8n:5678
+
+   # basicauth / {
+   #     # user: admin, password: strong-password
+   #     # Generate hash via: caddy hash-password --plaintext 'strong-password'
+   #     gedac $2a$14$cyAQ6gJO0.kLUfG0TUHSg.S3MbKr0Qq6Gm5mHJoLRCPdWfBZGmRni
+   # }
+    # Basic auth at the proxy layer
+   # basicauth /signin {
+   #     # user: admin, password: strong-password
+   #     # Generate hash via: caddy hash-password --plaintext 'strong-password'
+   #     gedac $2a$14$cyAQ6gJO0.kLUfG0TUHSg.S3MbKr0Qq6Gm5mHJoLRCPdWfBZGmRni
+   # }
+}

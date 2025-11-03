@@ -1,5 +1,21 @@
-n8n_data
-pg_data
-caddy
-files
-rag_init 
+# Runtime data directories (should not be committed)
+n8n_data/
+pg_data/
+files/
+
+# Caddy runtime data (but keep Caddyfile)
+caddy/data/
+caddy/config/
+
+# Environment files with sensitive data
+.env
+.env.local
+
+# Docker volumes and logs
+*.log
+docker-compose.override.yml
+
+# Backup files
+*.backup
+*.sql.gz
+

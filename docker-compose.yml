@@ -71,6 +71,7 @@ services:
       N8N_RUNNERS_TASK_BROKER_URI: "http://n8n:5679"
       N8N_RUNNERS_AUTH_TOKEN: "your-secure-auth-token-here"
       N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT: "15"
+      N8N_RUNNERS_TASK_TYPES: "python"
     networks: [web]
   
   # Dedicated PostgreSQL database with pgvector extension for RAG (Retrieval-Augmented Generation)

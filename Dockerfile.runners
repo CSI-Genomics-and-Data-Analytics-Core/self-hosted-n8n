@@ -11,9 +11,8 @@ RUN apk add --no-cache \
     g++ \
     linux-headers
 
-# Copy requirements file and task runner config
+# Copy requirements file
 COPY requirements.txt /tmp/requirements.txt
-COPY task-runners-config.json /etc/n8n-task-runners.json
 
 # Update pip and install additional Python packages
 RUN python -m pip install --upgrade pip setuptools wheel && \

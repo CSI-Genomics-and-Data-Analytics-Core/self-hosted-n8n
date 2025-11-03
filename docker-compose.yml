@@ -59,9 +59,11 @@ services:
       retries: 20
     networks: [web]
 
-  # External task runners for Python code execution
+  # External task runners for Python code execution with custom libraries
   task-runners:
-    image: n8nio/runners:1.117.3
+    build:
+      context: .
+      dockerfile: Dockerfile.runners
     restart: unless-stopped
     depends_on:
       - n8n

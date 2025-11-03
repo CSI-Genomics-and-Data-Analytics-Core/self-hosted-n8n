@@ -22,17 +22,33 @@ A Docker Compose setup for running n8n with external Python task runners and Pos
 ## Services
 
 - **n8n**: Main workflow automation platform
-- **task-runners**: External Python code execution environment
+- **task-runners**: Custom Python runner with additional libraries
 - **postgres**: Main n8n database
 - **postgres_rag**: Dedicated database for RAG operations with pgvector
 - **caddy**: Reverse proxy with SSL termination
 
 ## Features
 
-- External Python task runners for secure code execution
+- External Python task runners with custom libraries for secure code execution
 - PostgreSQL with pgvector extension for AI/RAG workflows
 - SSL termination via Caddy
 - Production-ready configuration
+
+## Custom Python Libraries
+
+The task runners include these additional Python libraries:
+- `requests` - HTTP client for API calls
+- `pandas` - Data manipulation and analysis
+- `matplotlib` - Plotting and visualization
+- Built-in libraries: `json`, `collections`, `time`, `datetime`
+
+### Managing Python Dependencies
+
+To add more Python libraries:
+
+1. Edit `requirements.txt` to add new packages
+2. Rebuild the custom image: `./build-runners.sh`
+3. Restart the services: `docker compose down && docker compose up -d`
 
 ## Management
 

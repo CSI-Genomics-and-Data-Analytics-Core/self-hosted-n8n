@@ -1,0 +1,11 @@
+# Python packages for n8n runners
+# Core libraries for data processing and API interactions
+requests
+pandas
+matplotlib
+
+# Additional utilities (already included in base image but listed for reference)
+# json - built-in Python library
+# collections - built-in Python library  
+# time - built-in Python library
+# datetime - built-in Python library

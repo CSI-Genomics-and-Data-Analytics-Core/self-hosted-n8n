@@ -1,0 +1,12 @@
+# Ignore unnecessary files during Docker build
+n8n_data/
+pg_data/
+caddy/data/
+caddy/config/
+files/
+.git/
+.gitignore
+README.md
+*.md
+.env
+docker-compose.override.yml

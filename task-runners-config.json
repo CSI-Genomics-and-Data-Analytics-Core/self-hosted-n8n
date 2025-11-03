@@ -1,0 +1,8 @@
+{
+  "python": {
+    "command": "python3"
+  },
+  "javascript": {
+    "command": "node"
+  }
+}

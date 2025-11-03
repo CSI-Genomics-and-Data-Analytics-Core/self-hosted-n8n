@@ -29,7 +29,7 @@ services:
       N8N_RUNNERS_ENABLED: "true"
       N8N_RUNNERS_MODE: "external"
       N8N_RUNNERS_BROKER_LISTEN_ADDRESS: "0.0.0.0"
-      N8N_RUNNERS_AUTH_TOKEN: "your-secure-auth-token-here"
+      N8N_RUNNERS_AUTH_TOKEN: "1f2f64b241e75db4e83429c2728062470d380cb14d9823d8096cde2b6d50a017"
       N8N_NATIVE_PYTHON_RUNNER: "true"
       
       # n8n's built-in Basic Auth
@@ -64,14 +64,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.runners
+    image: n8n-runner:custom
+    container_name: n8n-runners
     restart: unless-stopped
     depends_on:
       - n8n
     environment:
-      N8N_RUNNERS_TASK_BROKER_URI: "http://n8n:5679"
-      N8N_RUNNERS_AUTH_TOKEN: "your-secure-auth-token-here"
-      N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT: "15"
-      N8N_RUNNERS_TASK_TYPES: "python"
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
+      - N8N_RUNNERS_AUTH_TOKEN=1f2f64b241e75db4e83429c2728062470d380cb14d9823d8096cde2b6d50a017
+    
+    # Critical: Mount config file to override allowed dependencies
+    volumes:
+      - ./n8n-task-runners.json:/etc/n8n-task-runners.json
+    
     networks: [web]
   
   # Dedicated PostgreSQL database with pgvector extension for RAG (Retrieval-Augmented Generation)

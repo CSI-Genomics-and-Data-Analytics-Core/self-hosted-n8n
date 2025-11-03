@@ -8,6 +8,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      gdc-mcp-server:
+        condition: service_started
     environment:
       # DB connection
       DB_TYPE: postgresdb
@@ -84,6 +86,27 @@ services:
     volumes:
       - ./n8n-task-runners.json:/etc/n8n-task-runners.json
     
+    networks: [web]
+  
+  # GDC MCP Server - Model Context Protocol server for NCI GDC API integration
+  # Provides structured access to Genomic Data Commons for n8n workflows
+  gdc-mcp-server:
+    build:
+      context: /home/ubuntu/nci-gdc-mcp-server
+      dockerfile: Dockerfile.http
+    image: gdc-mcp-server:latest
+    container_name: gdc-mcp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MCP_SERVER_HOST=0.0.0.0
+      - MCP_SERVER_PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/mcp/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks: [web]
   
   # Dedicated PostgreSQL database with pgvector extension for RAG (Retrieval-Augmented Generation)

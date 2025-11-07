@@ -1,5 +1,5 @@
 # Custom n8n runners image with additional Python libraries
-FROM n8nio/runners:1.117.3
+FROM n8nio/runners:1.118.2
 
 # Switch to root to install packages
 USER root

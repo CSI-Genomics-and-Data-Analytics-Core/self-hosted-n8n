@@ -4,13 +4,18 @@ A Docker Compose setup for running n8n with external Python task runners and Pos
 
 ## Quick Start
 
-1. Generate a secure auth token:
+1. Create your local `.env` (it is git-ignored; never commit real values):
+   ```bash
+   cp .env.example .env
+   chmod 600 .env
+   ```
+
+2. Fill in each value in `.env` with a different random secret:
    ```bash
    openssl rand -hex 32
    ```
-
-2. Update the auth token in `docker-compose.yml`:
-   - Replace `your-secure-auth-token-here` in both n8n and task-runners services
+   Existing installs: Postgres only reads the password when its data directory is first created.
+   To change it later, run `ALTER USER ... WITH PASSWORD ...` inside the database, then update `.env`.
 
 3. Start the services:
    ```bash

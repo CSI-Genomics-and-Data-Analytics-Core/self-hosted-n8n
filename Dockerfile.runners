@@ -1,24 +1,12 @@
 # Custom n8n runners image with additional Python libraries
-FROM n8nio/runners:2.7.3
+# Keep this tag identical to the n8nio/n8n tag in docker-compose.yml.
+FROM n8nio/runners:2.49.7
 
-# Switch to root to install packages
 USER root
 
-# Install build dependencies required for Python packages
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    g++ \
-    linux-headers \
-    python3-dev \
-    py3-pip
-
-# Copy the extras.txt file with additional Python packages
-COPY extras.txt /app/task-runner-python/extras.txt
-
-# Install additional Python packages using system python and pip into the venv
-RUN set -e; \
-    python3 -m pip install --target /opt/runners/task-runner-python/.venv/lib/python*/site-packages --no-cache-dir -r /app/task-runner-python/extras.txt
+# The runners image has no apk (n8n removes it), so add packages with the bundled uv.
+COPY extras.txt /tmp/extras.txt
+RUN cd /opt/runners/task-runner-python && uv pip install --no-cache -r /tmp/extras.txt && rm /tmp/extras.txt
 
 # Switch back to the runner user
 USER runner

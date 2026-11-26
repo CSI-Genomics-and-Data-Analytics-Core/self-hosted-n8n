@@ -3,7 +3,7 @@ services:
   # n8n workflow automation platform - main application server
   # Provides the web UI and executes workflows with external task runner support
   n8n:
-    image: n8nio/n8n::2.7.3
+    image: n8nio/n8n:2.49.7
     restart: unless-stopped
     depends_on:
       postgres:
@@ -17,7 +17,7 @@ services:
       DB_POSTGRESDB_PORT: "5432"
       DB_POSTGRESDB_DATABASE: n8ndb
       DB_POSTGRESDB_USER: n8nuser
-      DB_POSTGRESDB_PASSWORD: n8npass
+      DB_POSTGRESDB_PASSWORD: ${N8N_DB_PASSWORD:?set N8N_DB_PASSWORD in .env}
 
       # External URL settings
       N8N_HOST: n8n.gedac.org
@@ -31,16 +31,11 @@ services:
       N8N_RUNNERS_ENABLED: "true"
       N8N_RUNNERS_MODE: "external"
       N8N_RUNNERS_BROKER_LISTEN_ADDRESS: "0.0.0.0"
-      N8N_RUNNERS_AUTH_TOKEN: "1f2f64b241e75db4e83429c2728062470d380cb14d9823d8096cde2b6d50a017"
+      N8N_RUNNERS_AUTH_TOKEN: ${N8N_RUNNERS_AUTH_TOKEN:?set N8N_RUNNERS_AUTH_TOKEN in .env}
       N8N_NATIVE_PYTHON_RUNNER: "true"
       
-      # n8n's built-in Basic Auth
-      # N8N_BASIC_AUTH_ACTIVE: "true"
-      # N8N_BASIC_AUTH_USER: "admin"
-      # N8N_BASIC_AUTH_PASSWORD: "strong-password"
-      
-      # Logging configuration - set to debug for detailed logs
-      N8N_LOG_LEVEL: "debug"
+      # Logging: "debug" can record request and workflow data, so enable it only while troubleshooting
+      N8N_LOG_LEVEL: "info"
       N8N_LOG_OUTPUT: "console,file"
       N8N_LOG_FILE_LOCATION: "/home/node/.n8n/logs/n8n.log"
       N8N_LOG_FILE_SIZE_MAX: "50"
@@ -57,7 +52,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: n8nuser
-      POSTGRES_PASSWORD: n8npass
+      POSTGRES_PASSWORD: ${N8N_DB_PASSWORD:?set N8N_DB_PASSWORD in .env}
       POSTGRES_DB: n8ndb
     volumes:
       - ./pg_data:/var/lib/postgresql/data
@@ -80,7 +75,7 @@ services:
       - n8n
     environment:
       - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
-      - N8N_RUNNERS_AUTH_TOKEN=1f2f64b241e75db4e83429c2728062470d380cb14d9823d8096cde2b6d50a017
+      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:?set N8N_RUNNERS_AUTH_TOKEN in .env}
     
     # Critical: Mount config file to override allowed dependencies
     volumes:
@@ -97,8 +92,9 @@ services:
     image: gdc-mcp-server:latest
     container_name: gdc-mcp-server
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    # Not published on the host: the MCP server has no auth here. n8n reaches it at http://gdc-mcp-server:8000
+    expose:
+      - "8000"
     environment:
       - MCP_SERVER_HOST=0.0.0.0
       - MCP_SERVER_PORT=8000
@@ -116,7 +112,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${RAG_DB_USER:-raguser}
-      POSTGRES_PASSWORD: ${RAG_DB_PASS:-ragpass}
+      POSTGRES_PASSWORD: ${RAG_DB_PASS:?set RAG_DB_PASS in .env}
       POSTGRES_DB: ${RAG_DB_NAME:-ragdb}
       PGDATA: /var/lib/postgresql/data
     command: >

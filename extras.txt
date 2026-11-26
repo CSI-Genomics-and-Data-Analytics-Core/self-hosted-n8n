@@ -1,5 +1,5 @@
-# Additional Python packages for n8n task runners
-# These will be installed in the task runner's virtual environment
-requests>=2.31.0
-pandas>=2.0.0
-numpy>=1.24.0
+# Additional Python packages for n8n task runners (installed into the runner virtual environment).
+# Pinned to the versions the server runs today; test a Python Code node before bumping.
+requests==2.32.5
+pandas==2.3.3
+numpy==2.3.4
